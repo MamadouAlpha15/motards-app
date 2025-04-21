@@ -57,6 +57,8 @@
         width: 130px;
     }
 </style>
+<a href="{{ route('motards.pub') }}" class="btn btn-warning">Voir le site d'Informations</a>
+
 
 <div class="motard-card">
     <!-- ✅ Image verte de validation (lien direct) -->

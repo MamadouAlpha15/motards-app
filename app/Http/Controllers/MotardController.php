@@ -125,4 +125,60 @@ class MotardController extends Controller
         // Affiche la vue de la carte avec les infos du motard
         return view('motards_carte', compact('motard'));
     }
+
+   public function publicite(){
+     
+    return view('publicite');
+   }
+
+   /**
+ * Affiche le formulaire d'édition d'un motard.
+ */
+public function edit($id)
+{
+    $motard = Motard::findOrFail($id);
+    return view('motards_edit', compact('motard'));
+}
+
+/**
+ * Met à jour les infos d'un motard.
+ */
+public function update(Request $request, $id)
+{
+    $motard = Motard::findOrFail($id);
+
+    $data = $request->validate([
+        'nom' => 'required',
+        'prenom' => 'required',
+        'telephone' => 'required',
+        'ligne' => 'required',
+        'numero_tuteur' => 'required',
+        'matricule' => 'required|unique:motards,matricule,' . $motard->id,
+        'base_stationnement' => 'required|string',
+        'station' => 'nullable|string',
+        'photo' => 'image|mimes:jpeg,png,jpg|max:2048',
+    ]);
+
+    if ($request->hasFile('photo')) {
+        $data['photo'] = $request->file('photo')->store('photos', 'public');
+    }
+
+    $motard->update($data);
+
+    return redirect()->route('motards.index')->with('success', 'Motard mis à jour avec succès !');
+}
+
+/**
+ * Supprime un motard.
+ */
+public function destroy($id)
+{
+    $motard = Motard::findOrFail($id);
+    $motard->delete();
+
+    return redirect()->route('motards.index')->with('success', 'Motard supprimé avec succès !');
+}
+
+
+
 }

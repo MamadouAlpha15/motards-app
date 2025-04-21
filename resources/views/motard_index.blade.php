@@ -71,6 +71,15 @@
                                 <div class="mt-2 d-flex justify-content-center gap-1">
                                     <a href="{{ route('motards.show', $motard->slug) }}" target="_blank" class="btn btn-info btn-sm no-print">Voir</a>
                                     <a href="{{ route('motards.carte', $motard->slug) }}" target="_blank" class="btn btn-primary btn-sm no-print">Imprimer la carte</a>
+                                    <a href="{{ route('motards.edit', $motard->id) }}" class="btn btn-warning btn-sm no-print">Modifier</a>
+
+<form action="{{ route('motards.destroy', $motard->id) }}" method="POST" style="display:inline;">
+    @csrf
+    @method('DELETE')
+    <button type="submit" class="btn btn-danger btn-sm no-print" onclick="return confirm('Voulez-vous vraiment supprimer ce motard ?')">Supprimer</button>
+</form>
+
+                 
                                 </div>
                             </div>
                         </td>
