@@ -2,183 +2,177 @@
 
 namespace App\Http\Controllers;
 
-// Importation des classes nécessaires
+// Importation des classes utiles de Laravel et des packages
 use Illuminate\Http\Request;
-use App\Models\Motard;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Models\Motard; // Le model Motard représente la table "motards" dans la base de données
+use SimpleSoftwareIO\QrCode\Facades\QrCode; // Pour générer des QR Codes
 
 class MotardController extends Controller
 {
     /**
-     * Affiche la liste des motards, groupés par ligne.
+     * Affiche la liste des motards, avec possibilité de recherche.
      */
-  public function index(Request $request)
-{
-    $recherche = $request->input('recherche');
-    $typeRecherche = null;
+    public function index(Request $request)
+    {
+        $recherche = $request->input('recherche'); // Récupère ce que l'utilisateur a tapé dans la barre de recherche
+        $typeRecherche = null; // Initialise une variable pour déterminer quel type de recherche a été fait
 
-    $motards = collect(); // collection vide par défaut
+        $motards = collect(); // Crée une collection vide de motards pour l'instant
 
-    if ($recherche) {
-        // Récupère toutes les lignes existantes (distinctes)
-        $lignesExistantes = Motard::distinct()->pluck('ligne')->toArray();
+        if ($recherche) { // Si l'utilisateur a fait une recherche
+            $lignesExistantes = Motard::distinct()->pluck('ligne')->toArray(); // Récupère toutes les lignes différentes (sans doublon)
 
-        // Détection du type de recherche
-        if (in_array($recherche, $lignesExistantes)) {
-            $typeRecherche = 'ligne';
-            $motards = Motard::where('ligne', $recherche)->get();
-        } elseif (Motard::where('matricule', 'like', '%' . $recherche . '%')->exists()) {
-            $typeRecherche = 'matricule';
-            $motards = Motard::where('matricule', 'like', '%' . $recherche . '%')->get();
-        } elseif (Motard::where('nom', 'like', '%' . $recherche . '%')
-            ->orWhere('prenom', 'like', '%' . $recherche . '%')->exists()) {
-            $typeRecherche = 'nom';
-            $motards = Motard::where('nom', 'like', '%' . $recherche . '%')
-                ->orWhere('prenom', 'like', '%' . $recherche . '%')->get();
+            // Teste si la recherche correspond à une ligne existante
+            if (in_array($recherche, $lignesExistantes)) {
+                $typeRecherche = 'ligne';
+                $motards = Motard::where('ligne', $recherche)->get(); // Cherche par ligne
+            }
+            // Sinon teste si la recherche correspond à un matricule
+            elseif (Motard::where('matricule', 'like', '%' . $recherche . '%')->exists()) {
+                $typeRecherche = 'matricule';
+                $motards = Motard::where('matricule', 'like', '%' . $recherche . '%')->get();
+            }
+            // Sinon teste si correspond à un nom ou un prénom
+            elseif (Motard::where('nom', 'like', '%' . $recherche . '%')
+                ->orWhere('prenom', 'like', '%' . $recherche . '%')->exists()) {
+                $typeRecherche = 'nom';
+                $motards = Motard::where('nom', 'like', '%' . $recherche . '%')
+                    ->orWhere('prenom', 'like', '%' . $recherche . '%')->get();
+            }
+            // Sinon cherche par stationnement (exemple T8)
+            elseif (Motard::where('base_stationnement', 'like', '%' . $recherche . '%')->exists()) {
+                $typeRecherche = 'base_stationnement';
+                $motards = Motard::where('base_stationnement', 'like', '%' . $recherche . '%')->get();
+            } else {
+                $typeRecherche = 'inconnu'; // Aucun motard trouvé
+            }
         } else {
-            $typeRecherche = 'inconnu';
+            // Si aucune recherche, on affiche tous les motards triés par ligne
+            $motards = Motard::orderBy('ligne')->get();
         }
-    } else {
-        // Si pas de recherche, on affiche tous les motards
-        $motards = Motard::orderBy('ligne')->get();
+
+        $motardsParLigne = $motards->groupBy('ligne'); // Regroupe les motards par leur ligne
+
+        // Retourne la vue avec les données
+        return view('motard_index', compact('motardsParLigne', 'recherche', 'typeRecherche'));
     }
 
-    $motardsParLigne = $motards->groupBy('ligne');
-
-    return view('motard_index', compact('motardsParLigne', 'recherche', 'typeRecherche'));
-}
-
-
-    
-    
     /**
-     * Affiche le formulaire de création d'un motard.
+     * Affiche le formulaire d'ajout d'un nouveau motard.
      */
     public function create()
     {
-        // Affiche la vue pour créer un nouveau motard
-        return view('motards_create');
+        return view('motards_create'); // Retourne la vue "ajouter un motard"
     }
 
     /**
-     * Enregistre un nouveau motard dans la base de données.
+     * Enregistre un nouveau motard dans la base.
      */
     public function store(Request $request)
     {
-        // Valide les données envoyées par le formulaire
+        // Valide les champs entrés par l'utilisateur
         $data = $request->validate([
             'nom' => 'required',
             'prenom' => 'required',
             'telephone' => 'required',
             'ligne' => 'required',
             'numero_tuteur' => 'required',
-            'matricule' => 'required|unique:motards', // Le matricule doit être unique
+            'matricule' => 'required|unique:motards', // Empêche les doublons de matricule
             'base_stationnement' => 'required|string',
-            'station' => 'nullable|string', // Champ optionnel
-            'photo' => 'image|mimes:jpeg,png,jpg|max:2048', // Fichier image obligatoire (max 2MB)
+            'station' => 'nullable|string',
+            'photo' => 'image|mimes:jpeg,png,jpg|max:2048', // Photo valide de 2 Mo max
         ]);
 
-        // Si une photo est envoyée, on la stocke et on enregistre le chemin
+        // Si une photo est présente dans la requête
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('photos', 'public'); // Stocke l'image
+        }
+
+        Motard::create($data); // Crée un nouveau motard avec les données validées
+
+        return redirect()->route('motards.index')->with('success', 'Motard ajouté !'); // Redirige avec message de succès
+    }
+
+    /**
+     * Affiche les détails d'un motard.
+     */
+    public function show($slug)
+    {
+        $motard = Motard::where('slug', $slug)->firstOrFail(); // Cherche le motard par son slug
+        return view('motards_show', compact('motard')); // Affiche la vue
+    }
+
+    /**
+     * Génère un QR Code qui mène à la fiche publique du motard.
+     */
+    public function qr($id)
+    {
+        $url = route('motards.show', $id); // URL vers la page publique du motard
+        return QrCode::size(200)->generate($url); // Retourne le QR Code généré
+    }
+
+    /**
+     * Affiche la carte d'identité du motard.
+     */
+    public function carte($slug)
+    {
+        $motard = Motard::where('slug', $slug)->firstOrFail(); // Récupère le motard
+        return view('motards_carte', compact('motard')); // Affiche la carte
+    }
+
+    /**
+     * Affiche une page de publicité (optionnel).
+     */
+    public function publicite()
+    {
+        return view('publicite');
+    }
+
+    /**
+     * Affiche la page pour modifier un motard.
+     */
+    public function edit($id)
+    {
+        $motard = Motard::findOrFail($id); // Récupère le motard à modifier
+        return view('motards_edit', compact('motard'));
+    }
+
+    /**
+     * Enregistre la mise à jour d'un motard.
+     */
+    public function update(Request $request, $id)
+    {
+        $motard = Motard::findOrFail($id); // Récupère le motard ciblé
+
+        $data = $request->validate([
+            'nom' => 'required',
+            'prenom' => 'required',
+            'telephone' => 'required',
+            'ligne' => 'required',
+            'numero_tuteur' => 'required',
+            'matricule' => 'required|unique:motards,matricule,' . $motard->id, // Matricule doit être unique sauf pour lui-même
+            'base_stationnement' => 'required|string',
+            'station' => 'nullable|string',
+            'photo' => 'image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('photos', 'public');
         }
 
-        // Création du motard avec les données validées
-        Motard::create($data);
+        $motard->update($data); // Met à jour avec les nouvelles données
 
-        // Redirige vers la liste avec un message de succès
-        return redirect()->route('motards.index')->with('success', 'Motard ajouté !');
+        return redirect()->route('motards.index')->with('success', 'Motard mis à jour avec succès !');
     }
 
     /**
-     * Affiche la fiche publique d'un motard à partir de son slug.
+     * Supprime un motard de la base.
      */
-    public function show($slug)
+    public function destroy($id)
     {
-        // Cherche le motard via son slug (clé unique)
-        $motard = Motard::where('slug', $slug)->firstOrFail();
+        $motard = Motard::findOrFail($id); // Trouve le motard
+        $motard->delete(); // Supprime le motard
 
-        // Affiche la vue de détail du motard
-        return view('motards_show', compact('motard'));
+        return redirect()->route('motards.index')->with('success', 'Motard supprimé avec succès !');
     }
-
-    /**
-     * Génère le QR Code contenant le lien vers la fiche du motard.
-     */
-    public function qr($id)
-    {
-        // Génère l'URL vers la fiche publique du motard
-        $url = route('motards.show', $id);
-
-        // Génère et retourne le QR Code
-        return QrCode::size(200)->generate($url);
-    }
-
-    /**
-     * Affiche la carte d'identité imprimable du motard.
-     */
-    public function carte($slug)
-    {
-        // Cherche le motard via son slug
-        $motard = Motard::where('slug', $slug)->firstOrFail();
-
-        // Affiche la vue de la carte avec les infos du motard
-        return view('motards_carte', compact('motard'));
-    }
-
-   public function publicite(){
-     
-    return view('publicite');
-   }
-
-   /**
- * Affiche le formulaire d'édition d'un motard.
- */
-public function edit($id)
-{
-    $motard = Motard::findOrFail($id);
-    return view('motards_edit', compact('motard'));
-}
-
-/**
- * Met à jour les infos d'un motard.
- */
-public function update(Request $request, $id)
-{
-    $motard = Motard::findOrFail($id);
-
-    $data = $request->validate([
-        'nom' => 'required',
-        'prenom' => 'required',
-        'telephone' => 'required',
-        'ligne' => 'required',
-        'numero_tuteur' => 'required',
-        'matricule' => 'required|unique:motards,matricule,' . $motard->id,
-        'base_stationnement' => 'required|string',
-        'station' => 'nullable|string',
-        'photo' => 'image|mimes:jpeg,png,jpg|max:2048',
-    ]);
-
-    if ($request->hasFile('photo')) {
-        $data['photo'] = $request->file('photo')->store('photos', 'public');
-    }
-
-    $motard->update($data);
-
-    return redirect()->route('motards.index')->with('success', 'Motard mis à jour avec succès !');
-}
-
-/**
- * Supprime un motard.
- */
-public function destroy($id)
-{
-    $motard = Motard::findOrFail($id);
-    $motard->delete();
-
-    return redirect()->route('motards.index')->with('success', 'Motard supprimé avec succès !');
-}
-
-
-
 }

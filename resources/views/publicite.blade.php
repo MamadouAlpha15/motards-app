@@ -1,7 +1,14 @@
 @php
-$mairePhotos = ['maire1.jpg', 'maire2.jpg', 'maire3.jpg', 'maire4.jpg'];
-shuffle($mairePhotos); // Mélange les photos de manière aléatoire
+    $mairePhotos = ['maire1.jpg', 'maire2.jpg', 'maire3.jpg', 'maire4.jpg'];
+    $commentaires = [
+        'Le maire en réunion avec les motards.',
+        'Visite officielle du maire à la base centrale.',
+        'Le maire lors de la journée de sécurité routière.',
+        'Rencontre avec les chefs de ligne.'
+    ];
+    shuffle($mairePhotos); // Mélange les photos
 @endphp
+
 
 @php $hideHeader = true; @endphp
 
@@ -116,12 +123,14 @@ shuffle($mairePhotos); // Mélange les photos de manière aléatoire
     }
 
     .formation-img {
-        width: 300px;
-        height: 300px;
-        object-fit: cover;
-        border: 4px solid #1abc9c;
-        transition: transform 0.4s ease, box-shadow 0.4s ease;
-    }
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    object-position: top; /* 👈 Centrage sur la tête */
+    border: 4px solid #1abc9c;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
 
     .formation-img:hover {
         transform: scale(1.1) rotate(1deg);
@@ -223,7 +232,7 @@ shuffle($mairePhotos); // Mélange les photos de manière aléatoire
     }
 
     .decorative-img {
-        height: 300px;
+        height: 180px;
         border-radius: 12px;
         box-shadow: 0 0 15px rgba(0,0,0,0.2);
     }
@@ -239,12 +248,13 @@ shuffle($mairePhotos); // Mélange les photos de manière aléatoire
     display: flex;
     gap: 20px;
     transition: transform 0.5s ease;
-    scroll-behavior: smooth;
+    /* scroll-behavior: smooth; */ /* ← désactive le défilement fluide automatique */
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE 10+ */
 }
+
 
 .ligne-carousel::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
@@ -344,30 +354,121 @@ shuffle($mairePhotos); // Mélange les photos de manière aléatoire
     <h1>Site d'information Motards Certifiée</h1>
 </div>
 
+<p>
+Bienvenue sur le site officiel des motards de la Commune Urbaine de Dubréka.  
+Nous sommes fiers de représenter une communauté dynamique, disciplinée et engagée pour le bien-être de tous.  
+Chaque jour, nos motards parcourent les routes avec courage et dévouement, veillant à la sécurité et à la fluidité de la circulation pour tous les citoyens.
+
+Être motard à Dubréka, c’est bien plus qu’un simple métier : c’est une vocation, un engagement de cœur envers sa communauté.  
+Nos équipes incarnent l’esprit de solidarité, de responsabilité et de respect qui font la fierté de notre commune.
+
+Nous croyons en une jeunesse motivée, en des leaders exemplaires et en une société unie autour de valeurs fortes.  
+Nos motards sont formés pour agir avec rapidité, rigueur et respect, que ce soit lors des grands événements officiels ou au quotidien dans les quartiers.
+
+Chaque klaxon est un appel à la vigilance, chaque trajectoire un symbole de discipline et de respect des règles.  
+Nous saluons le professionnalisme et l'esprit de famille qui animent chacun de nos motards.
+
+Explorez ce site pour mieux connaître nos équipes, nos missions et nos engagements.  
+Merci de votre visite et bonne découverte ! 🚀
+</p>
+
 <!-- Section Nos Responsables -->
 <div class="nos-formations-section position-relative">
     <div class="container content-section text-center">
         <h2 class="mb-4"><strong>Le Maire</strong></h2>
         <div class="row justify-content-center">
-            @foreach($mairePhotos as $photo)
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 formation-box">
-                <img src="{{ asset('storage/photos/' . $photo) }}" class="formation-img" alt="Formation">
-            </div>
-            @endforeach
-
-            </div> <!-- Fin de la boucle des responsables -->
-
-<!-- Nouvelle section des sponsors/publicités -->
-<h2 class="mb-4 mt-5"><strong>Nos Staffs / Groupe</strong></h2>
-<div class="row justify-content-center">
-    @foreach(['commune2.jpg', 'commune3.jpg', 'commune4.jpg', 'commune5.jpg', 'commune.jpg', 'commune7.jpg','commune8.jpg','commune3.jpg'] as $pub)
-    <div class="col-6 col-sm-4 col-md-3 mb-4">
-        <div class="card shadow-sm border-0">
-            <img src="{{ asset('storage/photos/' . $pub) }}" class="card-img-top" style="height: 300px;  object-fit: cover; border-radius: 12px; "  alt="Sponsor">
-        </div>
+        @foreach($mairePhotos as $index => $photo)
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 formation-box">
+        <img src="{{ asset('storage/photos/' . $photo) }}" class="formation-img" alt="Formation">
+        <p class="mt-2 text-white text-center" style="font-weight:bold;">
+            {{ $commentaires[$index] ?? 'Description non disponible' }}
+        </p>
     </div>
-    
+@endforeach
+<p>Hommage à Nos Motards
+Les motards de la Commune Urbaine de Dubréka ne sont pas de simples conducteurs. Ils sont les gardiens du mouvement, les veilleurs du quotidien, ceux qui bravent le vent et la pluie pour transporter, protéger, guider et parfois même sauver. Leur rôle dépasse le guidon : ils sont des piliers sociaux, des relais entre les quartiers, des figures respectées dans nos rues.
+
+Une discipline, une fierté
+Chaque casque porté est un symbole de responsabilité. Chaque klaxon, un signal d’attention. Nos motards sont formés, encadrés et inspirés par un seul objectif : servir la population dans la dignité et le respect des règles. Leur présence rassure, leur organisation impressionne. Nous les saluons pour leur ponctualité, leur esprit d’équipe et leur sens élevé du devoir.
+
+Unis comme un moteur bien réglé
+Qu’il s’agisse d’encadrer une cérémonie officielle, de participer à une mission humanitaire, ou simplement de traverser les artères de la commune pour informer et sensibiliser, les motards sont toujours présents, solidaires et organisés. Ils roulent ensemble, se protègent mutuellement et veillent au bon déroulement de chaque activité. Leur devise : Ensemble, plus loin, plus fort.
+
+Merci, chers motards
+À tous les motards de notre commune, à ceux qui donnent sans compter, qui sillonnent nos routes de jour comme de nuit, nous vous disons MERCI. Votre courage, votre endurance et votre engagement sont une source d’inspiration. Nous sommes fiers de vous compter parmi les bâtisseurs silencieux mais puissants de Dubréka. Vous êtes nos moteurs humains.
+
+Les Motards : Héros de Nos Routes
+Nos motards sont les héros discrets de la Commune Urbaine de Dubréka. Jour après jour, ils sillonnent nos rues, portant non seulement leur passion pour la moto mais aussi une responsabilité immense. Ils sont les yeux et les oreilles de la communauté, veillant à la sécurité de tous tout en restant à l'écoute des besoins de la population. Leur rôle est essentiel, leur engagement inébranlable.
+
+Une Passion au Service de la Communauté
+Chaque motard incarne bien plus qu'un simple conducteur. Ils sont des ambassadeurs de la sécurité, des membres actifs qui participent à la bonne marche de notre commune. Ils sont là pour guider, transporter, et protéger. Que ce soit lors d’événements officiels, de missions urgentes ou d’activités de routine, leur présence est un gage de fiabilité et de réactivité.
+
+Des Moto-Patrouilles pour Votre Sécurité
+Les patrouilles de motards sont une partie intégrante du dispositif de sécurité publique. Grâce à leur mobilité et leur capacité à se faufiler dans les embouteillages, les motards peuvent rapidement intervenir en cas de besoin. Leur rôle est de maintenir l’ordre, faire respecter les règles, et assurer une présence visible dans les lieux publics et lors des événements communautaires. Leur travail n’est pas seulement une profession, c’est une vocation.
+
+Un Engagement Sans Limites
+Les motards de Dubréka sont des hommes et des femmes qui ne connaissent pas de limites. Qu’il pleuve, qu’il vente ou qu’il fasse une chaleur étouffante, ils sont toujours là, prêts à rouler pour la communauté. Leur courage, leur détermination et leur sens du devoir font d’eux des modèles pour les jeunes générations.
+
+Nous Vous Rendons Hommage
+À tous nos motards, vous êtes une partie intégrante de notre quotidien. Grâce à vous, nous nous sentons plus sûrs, plus connectés et plus engagés dans la vie communautaire. Vos efforts sont une source de respect et de gratitude. Nous vous rendons hommage et vous remercions pour tout ce que vous faites pour la Commune Urbaine de Dubréka.</p>
+            </div> <!-- Fin de la boucle des responsables -->
+        
+<@php
+    $staffs = [
+        'commune2.jpg' => "Le groupe sécurité veille à la discipline et à la sécurité des événements organisés.
+        
+        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.",
+        
+        'commune3.jpg' => "L’équipe technique assure le bon fonctionnement des équipements et du matériel. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.",
+        
+        'commune4.jpg' => "Les responsables des relations publiques communiquent avec les autorités et partenaires. 
+        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.",
+        'commune5.jpg' => "Le staff d’organisation s’occupe des itinéraires et du timing des cortèges.
+        ✅ Engagement communautaire
+À Dubréka, chaque citoyen est un maillon essentiel de notre développement. Nos groupes de motards, nos encadreurs, nos staffs techniques et administratifs travaillent main dans la main pour bâtir une communauté forte, solidaire et innovante. Chaque événement, chaque sortie, chaque rencontre est une opportunité de renforcer les liens sociaux et de promouvoir la paix et la sécurité.
+
+",
+        'commune.jpg'  => "Les animateurs mettent de l’ambiance et motivent les motards lors des événements.
+        ✅ Unis pour le progrès
+Le progrès ne se mesure pas uniquement à travers les infrastructures, mais aussi par la qualité de l’unité qui règne au sein d’une commune. Nos équipes s’engagent quotidiennement pour faire rayonner la Commune Urbaine de Dubréka, en valorisant nos talents locaux, en formant les jeunes, et en assurant un cadre de vie digne et respectueux pour tous.",
+        'commune7.jpg' => "L’équipe logistique transporte les outils, les supports et s’occupe des installations.",
+        'commune8.jpg' => "Les encadreurs accompagnent les nouveaux et veillent à une bonne intégration.
+        ✅ Le motard citoyen
+Être motard à Dubréka, ce n’est pas seulement conduire une moto. C’est appartenir à un réseau de citoyens engagés, respectueux du code de la route, protecteurs des plus faibles et toujours disponibles pour servir la communauté. Par leur discipline et leur solidarité, nos motards incarnent les valeurs les plus nobles de la co",
+        'commune3.jpg' => "Les superviseurs coordonnent les actions entre les groupes et interviennent si besoin."
+    ];
+@endphp
+
+<h2 class="mb-4 mt-5 text-center"><strong>Nos Staffs / Groupe</strong></h2>
+<div class="row justify-content-center">
+    @foreach($staffs as $photo => $commentaire)
+        <div class="col-6 col-sm-4 col-md-3 mb-4 d-flex flex-column align-items-center">
+            <div class="card shadow-sm border-0 w-100">
+                <img src="{{ asset('storage/photos/' . $photo) }}" class="card-img-top rounded" style="height: 300px; object-fit: cover;" alt="Staff">
+            </div>
+            <p class="mt-2 text-center small" style="max-width: 100%;">{{ $commentaire }}</p>
+        </div>
     @endforeach
+</div>
+
     <strong>Jolie N'est Ce Pas?</strong>
     <!-- Petite image décorative en bas -->
     <div class="animated-section text-center">
@@ -381,7 +482,34 @@ shuffle($mairePhotos); // Mélange les photos de manière aléatoire
         </div>
     </div>
 </div>
+<div class="d-flex justify-content-center my-4">
+    <img src="{{ asset('storage/photos/G.webp') }}" alt="Guinee" class="decorative-img">
+    
+</div>
+<h1 class="text-center">Guinee</h1>
+
+<p>L'Aventure et la Liberté : La Vie de Motard
+Être motard, ce n’est pas seulement conduire une moto, c’est vivre une aventure quotidienne. Chaque route devient un nouveau défi, chaque virage une opportunité d’explorer. La liberté que procure la moto est incomparable, une sensation unique qui rapproche les motards de la route et du monde. Quand tu enfourches ta moto, tu deviens le maître de ton chemin, et rien n’est plus gratifiant.
+
+Les Motards : Des Ambassadeurs de la Route
+Les motards ne sont pas seulement des conducteurs ; ils sont des ambassadeurs de la route, prônant des valeurs de respect, de sécurité et de convivialité. En tant que motard, tu es un modèle pour tous ceux qui t’entourent. Ton comportement sur la route inspire, et ton respect des règles encourage les autres à faire de même. La moto n’est pas un simple moyen de transport, c’est un mode de vie, un engagement à préserver l’ordre et à défendre la sécurité sur nos routes.
+
+Rester Fort dans les Moments Difficiles
+La vie d’un motard n’est pas toujours simple. Parfois, les conditions de circulation peuvent être difficiles, parfois même dangereuses. Mais un vrai motard ne se laisse jamais abattre par les obstacles. Au contraire, ces moments sont une preuve de force et une occasion de se surpasser. Les motards savent que chaque défi est une chance de grandir et de devenir meilleur.
+
+L'Esprit d'Équipe et la Fraternité des Motards
+Les motards partagent plus qu'une passion, ils partagent une fraternité. En dehors des routes, un motard peut toujours compter sur un autre motard. La solidarité est au cœur de la communauté des motards. Dans chaque rencontre, il y a un esprit d’entraide, une volonté de s’entraider dans les moments difficiles. Que ce soit pour des conseils mécaniques, des astuces de conduite ou simplement pour partager un bon moment, les motards sont toujours là pour les autres.
+
+La Route Est un Terrain de Jeu pour les Motards
+La route n’est pas simplement un trajet d’un point A à un point B. Pour les motards, la route est un terrain de jeu, un lieu où chaque virage est une occasion de tester ses limites et de ressentir l’adrénaline. C’est dans cet environnement que les motards se sentent vivants, où leur passion et leur compétence sont mises à l’épreuve à chaque instant. Mais la route est aussi un terrain de respect, où les motards doivent être vigilants, responsables et toujours conscients des autres usagers.
+
+Vivre sa Passion avec Intensité
+Être motard, c’est vivre avec intensité. C’est ressentir chaque moment sur la route comme un instinct, une véritable passion. C’est donner tout ce que l’on a à chaque trajet, en cherchant toujours à se perfectionner et à vivre pleinement sa passion. La moto n’est pas seulement un hobby, c’est un art de vivre, une manière de se connecter à soi-même et au monde qui nous entoure.
+
+</p>
+
 <h1 class="text-center my-5" style="color: #1abc9c; font-weight: bold;">Les Chefs De Lignes</h1>
+<p class="text-center">Pour Touts Besoin Veuillez Contacter les chefs de ligne </p>
 
 <div class="ligne-carousel-container">
     <button class="carousel-btn prev-btn">&#10094;</button>
@@ -445,31 +573,20 @@ shuffle($mairePhotos); // Mélange les photos de manière aléatoire
 
 
 <script>
-    const carousel = document.getElementById('ligneCarousel');
-    const nextBtn = document.querySelector('.next-btn');
-    const prevBtn = document.querySelector('.prev-btn');
+    document.addEventListener('DOMContentLoaded', () => {
+        const carousel = document.getElementById('ligneCarousel');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
 
-    // Auto scroll toutes les 3s
-    let scrollInterval = setInterval(() => {
-        carousel.scrollBy({ left: 270, behavior: 'smooth' });
-    }, 3000);
+        prevBtn.addEventListener('click', () => {
+            carousel.scrollBy({ left: -300, behavior: 'smooth' });
+        });
 
-    // Stop scroll auto si souris entre
-    carousel.addEventListener('mouseenter', () => clearInterval(scrollInterval));
-    carousel.addEventListener('mouseleave', () => {
-        scrollInterval = setInterval(() => {
-            carousel.scrollBy({ left: 270, behavior: 'smooth' });
-        }, 3000);
-    });
-
-    // Flèches manuelles
-    nextBtn.addEventListener('click', () => {
-        carousel.scrollBy({ left: 270, behavior: 'smooth' });
-    });
-
-    prevBtn.addEventListener('click', () => {
-        carousel.scrollBy({ left: -270, behavior: 'smooth' });
+        nextBtn.addEventListener('click', () => {
+            carousel.scrollBy({ left: 300, behavior: 'smooth' });
+        });
     });
 </script>
+
 
 @endsection
