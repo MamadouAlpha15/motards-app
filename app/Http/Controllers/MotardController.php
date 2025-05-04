@@ -13,49 +13,63 @@ class MotardController extends Controller
      * Affiche la liste des motards, avec possibilité de recherche.
      */
     public function index(Request $request)
-    {
-        $recherche = $request->input('recherche'); // Récupère ce que l'utilisateur a tapé dans la barre de recherche
-        $typeRecherche = null; // Initialise une variable pour déterminer quel type de recherche a été fait
+{
+    $recherche = $request->input('recherche');
+    $typeRecherche = null;
 
-        $motards = collect(); // Crée une collection vide de motards pour l'instant
+    if ($recherche) {
+        // Récupère toutes les lignes existantes
+        $lignesExistantes = Motard::distinct()->pluck('ligne')->toArray();
 
-        if ($recherche) { // Si l'utilisateur a fait une recherche
-            $lignesExistantes = Motard::distinct()->pluck('ligne')->toArray(); // Récupère toutes les lignes différentes (sans doublon)
-
-            // Teste si la recherche correspond à une ligne existante
-            if (in_array($recherche, $lignesExistantes)) {
-                $typeRecherche = 'ligne';
-                $motards = Motard::where('ligne', $recherche)->get(); // Cherche par ligne
-            }
-            // Sinon teste si la recherche correspond à un matricule
-            elseif (Motard::where('matricule', 'like', '%' . $recherche . '%')->exists()) {
-                $typeRecherche = 'matricule';
-                $motards = Motard::where('matricule', 'like', '%' . $recherche . '%')->get();
-            }
-            // Sinon teste si correspond à un nom ou un prénom
-            elseif (Motard::where('nom', 'like', '%' . $recherche . '%')
-                ->orWhere('prenom', 'like', '%' . $recherche . '%')->exists()) {
-                $typeRecherche = 'nom';
-                $motards = Motard::where('nom', 'like', '%' . $recherche . '%')
-                    ->orWhere('prenom', 'like', '%' . $recherche . '%')->get();
-            }
-            // Sinon cherche par stationnement (exemple T8)
-            elseif (Motard::where('base_stationnement', 'like', '%' . $recherche . '%')->exists()) {
-                $typeRecherche = 'base_stationnement';
-                $motards = Motard::where('base_stationnement', 'like', '%' . $recherche . '%')->get();
-            } else {
-                $typeRecherche = 'inconnu'; // Aucun motard trouvé
-            }
-        } else {
-            // Si aucune recherche, on affiche tous les motards triés par ligne
-            $motards = Motard::orderBy('ligne')->get();
+        if (in_array($recherche, $lignesExistantes)) {
+            // Recherche par ligne
+            $typeRecherche = 'ligne';
+            $motards = Motard::where('ligne', $recherche)
+                ->orderBy('created_at', 'desc')
+                ->get();
         }
-
-        $motardsParLigne = $motards->groupBy('ligne'); // Regroupe les motards par leur ligne
-
-        // Retourne la vue avec les données
-        return view('motard_index', compact('motardsParLigne', 'recherche', 'typeRecherche'));
+        elseif (Motard::where('matricule', 'like', '%' . $recherche . '%')->exists()) {
+            // Recherche par matricule
+            $typeRecherche = 'matricule';
+            $motards = Motard::where('matricule', 'like', '%' . $recherche . '%')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+        elseif (Motard::where('nom', 'like', '%' . $recherche . '%')
+            ->orWhere('prenom', 'like', '%' . $recherche . '%')
+            ->exists()
+        ) {
+            // Recherche par nom ou prénom
+            $typeRecherche = 'nom';
+            $motards = Motard::where('nom', 'like', '%' . $recherche . '%')
+                ->orWhere('prenom', 'like', '%' . $recherche . '%')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+        elseif (Motard::where('base_stationnement', 'like', '%' . $recherche . '%')->exists()) {
+            // Recherche par stationnement
+            $typeRecherche = 'base_stationnement';
+            $motards = Motard::where('base_stationnement', 'like', '%' . $recherche . '%')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+        else {
+            // Aucun résultat
+            $typeRecherche = 'inconnu';
+            $motards = collect();
+        }
+    } else {
+        // Liste complète, triée par ligne puis date de création (nouveau en premier)
+        $motards = Motard::orderBy('ligne')
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
+
+    // Regroupe par ligne pour la vue
+    $motardsParLigne = $motards->groupBy('ligne');
+
+    return view('motard_index', compact('motardsParLigne', 'recherche', 'typeRecherche'));
+}
 
     /**
      * Affiche le formulaire d'ajout d'un nouveau motard.
@@ -175,4 +189,28 @@ class MotardController extends Controller
 
         return redirect()->route('motards.index')->with('success', 'Motard supprimé avec succès !');
     }
+
+
+    
+    public function deleteSelected(Request $request)
+{
+    $ids = $request->input('motards_selection');
+    if ($ids) {
+        Motard::whereIn('id', $ids)->delete();
+        return redirect()->route('motards.index')->with('success', 'Motards supprimés avec succès.');
+    } else {
+        return redirect()->route('motards.index')->with('error', 'Aucun motard sélectionné.');
+    }
+}
+
+public function imprimerSelection(Request $request)
+{
+    $ids = explode(',', $request->ids);
+
+    $motards = Motard::whereIn('id', $ids)->get();
+
+    return view('motards_imprimer_selection', compact('motards'));
+}
+
+
 }

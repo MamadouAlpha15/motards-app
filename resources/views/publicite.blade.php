@@ -1,592 +1,419 @@
+{{-- resources/views/publicite.blade.php --}}
+@extends('layouts.app')  {{-- Étend le layout principal situé dans resources/views/layouts/app.blade.php --}}
+
 @php
+    // Début d’un bloc PHP : on définit un tableau de noms de fichiers et un tableau de descriptions
     $mairePhotos = ['maire1.jpg', 'maire2.jpg', 'maire3.jpg', 'maire4.jpg'];
     $commentaires = [
-        'Le maire en réunion avec les motards.',
-        'Visite officielle du maire à la base centrale.',
-        'Le maire lors de la journée de sécurité routière.',
-        'Rencontre avec les chefs de ligne.'
+        'Le maire en réunion avec nos motards, pour renforcer notre engagement commun.',
+        'Visite officielle à la base centrale : confiance et collaboration.',
+        'Sensibilisation à la sécurité routière, priorité de chaque instant.',
+        'Échange avec les chefs de ligne : vision et solidarité.'
     ];
-    shuffle($mairePhotos); // Mélange les photos
+    shuffle($mairePhotos); // Mélange aléatoirement l’ordre des photos pour varier l’affichage
 @endphp
 
+@php $hideHeader = true; @endphp  {{-- Cache le header global du layout si nécessaire --}}
 
-@php $hideHeader = true; @endphp
+@section('content')  {{-- Début de la section "content" qui remplace @yield('content') dans le layout --}}
 
-@extends('layouts.app')
-
-@section('content')
 <style>
-    /* Section de l'image d'accueil */
+    /* ==== Fond général ultrajolie ==== */
+    body {
+        /* dégradé diagonal du haut-gauche vers le bas-droit */
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        min-height: 100vh;      /* s’assure que le body prend toute la hauteur */
+        color: #333;            /* couleur du texte */
+        margin: 0;              /* supprime marges par défaut du navigateur */
+        padding: 0;             /* supprime padding par défaut du navigateur */
+        box-sizing: border-box; /* inclut padding et border dans la taille des éléments */
+    }
+
+    /* ==== Header principal ==== */
+    .site-header {
+        background: linear-gradient(to right,rgb(28, 17, 153), #38ef7d); /* dégradé horizontal */
+        padding: 0.5rem 1rem;            /* espace intérieur du header */
+        display: flex;                   /* active le flexbox */
+        flex-wrap: wrap;                 /* permet aux colonnes de passer à la ligne sur mobile */
+        align-items: center;             /* centre verticalement les éléments */
+        justify-content: space-between;  /* écarte les éléments aux extrémités */
+        color: white;                    /* texte en blanc */
+    }
+    .site-header .left {
+        text-align: center;              /* centre le texte/image horizontalement */
+    }
+    .site-header img.logo {
+        height: 130px;                   /* fixe la hauteur du logo */
+        margin-bottom: .5rem;             /* espace sous le logo */
+        float: left;   
+    }
+    .site-header .title {
+        font-size: 1.2rem;               /* taille du texte du titre */
+        font-weight: bold;               /* texte en gras */
+    }
+    .site-header .right {
+        text-align: center;              /* centre le contenu à droite */
+    }
+    .photo-row {
+        display: flex;                   /* ligne d’images */
+        gap: 1rem;                       /* espace entre chaque photo */
+        justify-content: center;         /* centre les photos */
+    }
+    .photo-cadre {
+        width: 120px;                    /* largeur de chaque photo */
+        height: 120px;                   /* hauteur de chaque photo */
+        object-fit: cover;               /* recadre l’image pour remplir le cadre */
+        border: 3px solid white;         /* bordure blanche autour */
+        border-radius: 8px;              /* coins arrondis */
+        transition: transform .3s;       /* animation de zoom au survol */
+    }
+    .photo-cadre:hover {
+        transform: scale(1.05);          /* zoom léger au survol */
+    }
+    .contact-link {
+        display: inline-block;           /* agit comme un bouton en ligne */
+        margin-top: .5rem;               /* espace au-dessus */
+        padding: .5rem 1rem;             /* espace intérieur */
+        background: rgba(255,255,255,0.2); /* fond semi-transparent */
+        border-radius: 8px;              /* coins arrondis */
+        color: white;                    /* texte blanc */
+        text-decoration: none;           /* supprime le soulignement */
+        transition: background .3s;      /* animation au survol */
+    }
+    .contact-link:hover {
+        background: rgba(255,255,255,0.4); /* change l’opacité au survol */
+    }
+
+    /* ==== Section d'accueil ==== */
     .hero-section {
-        background-image: url('{{ asset('storage/photos/font.jpg') }}');
+        /* image de fond fixe qui couvre tout l’élément */
+        background-image: url('{{ asset("storage/photos/font.jpg") }}');
         background-attachment: fixed;
         background-size: cover;
         background-position: center;
-        height: 60vh;
-        color: white;
-        display: flex;
+        height: 60vh;                    /* 60% de la hauteur de la fenêtre */
+        display: flex;                   /* active flex pour centrer le titre */
         align-items: center;
         justify-content: center;
-        text-shadow: 2px 2px 4px #000;
+        text-shadow: 2px 2px 6px rgba(0,0,0,0.7); /* ombre autour du texte */
     }
-
     .hero-section h1 {
-        font-size: 3rem;
+        color: white;                    /* texte en blanc */
+        font-size: 3rem;                 /* très grand titre */
+        margin: 0;                       /* supprime marges autour du h1 */
     }
 
-    /* En-tête avec logo et photos */
-    .site-header {
-        background: linear-gradient(to right, #11998e, #38ef7d);
-        color: white;
-        padding: 0.5rem 1rem;
-        top: 0;
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
+    /* ==== Présentation ==== */
+    .intro-text {
+        max-width: 800px;                /* largeur max pour faciliter la lecture */
+        margin: 2rem auto;               /* centré avec marge verticale */
+        text-align: center;              /* texte centré */
+        font-size: 1.1rem;               /* taille de police un peu plus grande */
     }
 
-    .site-header .left {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    .site-header img.logo {
-        height: 130px;
-        margin-bottom: 10px;
-    }
-
-    .site-header .title {
-        font-weight: bold;
-        color: white;
-        font-size: 1.2rem;
-    }
-
-    /* Partie droite avec les deux images et le contact */
-    .site-header .right {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .right .photo-row {
-        display: flex;
-        flex-direction: row;
-        gap: 20px;
-        flex-wrap: wrap; /* Assurer que les images se réorganisent sur les petits écrans */
-        justify-content: center; /* Centrer les images */
-    }
-
-    .photo-cadre {
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
-        border: 3px solid white;
-        box-shadow: 0 0 10px rgba(255,255,255,0.6);
-        transition: transform 0.3s ease;
-    }
-
-    .photo-cadre:hover {
-        transform: scale(1.05);
-    }
-
-    /* Lien contact en bas des deux images */
-    .contact-link {
-        color: #ffffff;
-        text-decoration: none;
-        padding: 8px 16px;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        font-weight: bold;
-        border: 2px solid #1abc9c;
-        white-space: nowrap;
-    }
-
-    .contact-link:hover {
-        background-color: #1abc9c;
-        color: white;
-        box-shadow: 0 0 15px #1abc9c;
-    }
-
+    /* ==== "Le Maire" ==== */
     .nos-formations-section {
-        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7));
-
-
-
-
-        padding: 4rem 1rem;
-        border-radius: 20px;
+        background: rgba(0,0,0,0.5);      /* fond sombre semi-transparent */
+        padding: 3rem 1rem;               /* espace intérieur large */
+        border-radius: 20px;              /* coins très arrondis */
+        color: white;                     /* texte blanc */
     }
-
-    .formation-img {
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
-    object-position: top; /* 👈 Centrage sur la tête */
-    border: 4px solid #1abc9c;
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
-}
-
-
-    .formation-img:hover {
-        transform: scale(1.1) rotate(1deg);
-        box-shadow: 0 0 25px rgba(26, 188, 156, 0.6);
-    }
-
     .formation-box {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: all 0.6s ease-in-out;
+        margin-bottom: 2rem;              /* espace sous chaque carte */
+    }
+    .formation-img {
+        width: 100%;                      /* prend toute la largeur de son parent */
+        height: 200px;                    /* hauteur fixe */
+        object-fit: cover;                /* recadre l’image proprement */
+        border: 4px solid #1abc9c;        /* bordure colorée */
+        border-radius: 8px;               /* coins arrondis */
+        transition: transform .4s, box-shadow .4s; /* animation au survol */
+    }
+    .formation-img:hover {
+        transform: scale(1.05);           /* zoom un peu plus grand */
+        box-shadow: 0 0 20px rgba(26,188,156,0.6); /* ombre colorée */
+    }
+    .formation-box p {
+        margin-top: .5rem;                /* petit espace au-dessus du texte */
+        font-weight: bold;                /* texte en gras */
     }
 
-    .formation-box.show {
-        opacity: 1;
-        transform: translateY(0);
-        animation: fadeInUp 1s ease forwards;
+    /* ==== Staffs / Groupe ==== */
+    .staff-card {
+        background: white;                /* fond blanc */
+        padding: 1rem;                    /* espace intérieur */
+        border-radius: 12px;              /* coins arrondis */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* légère ombre */
+        text-align: center;               /* contenu centré */
     }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .formation-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 30px;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
-    }
-
-    /* Media Query pour les petits écrans */
-    @media (max-width: 768px) {
-        .site-header {
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .right .photo-row {
-            justify-content: center;
-        }
-
-        .photo-cadre {
-            width: 100px;
-            height: 100px; /* Ajuste la taille des images sur petits écrans */
-        }
-    }
-
-    .text-contact {
-        color: black !important;
-        font-weight: bold;
-    }
-
-    .welcome-text {
-        color: blue;
-        font-weight: bold;
-    }
-
-    
-
-@keyframes slide-moto {
-  0%   { transform: translateX(0); }
-  50%  { transform: translateX(150px); } /* trajet vers la droite */
-  100% { transform: translateX(0); }     /* retour */
+    .staff-card img {
+    width: 100%;      /* l’image prend toute la largeur de son conteneur */
+    height: 400px;     /* la hauteur s’ajuste proportionnellement */
+    object-fit: cover;/* recadre proprement l’image si nécessaire */
+    border-radius: 8px;
+    margin-bottom: .5rem;
 }
+    .staff-card p {
+        color: #555;                      /* texte gris foncé */
+        font-size: .95rem;                /* taille légèrement réduite */
+    }
 
-
-<!-- Texte animé + image décorative -->
-<style>
+    /* ==== Taxi Moto animé ==== */
     .animated-section {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 30px;
-        margin-top: 30px;
-        margin-bottom: 60px;
-        flex-wrap: wrap;
+        display: flex;                    /* affiche en ligne */
+        justify-content: center;          /* centre horizontalement */
+        align-items: center;              /* centre verticalement */
+        gap: 2rem;                        /* espace entre les items */
+        margin: 3rem 0;                   /* marge verticale */
+        flex-wrap: wrap;                  /* passe à la ligne sur petits écrans */
     }
-
     .animated-text {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #1abc9c;
-        animation: blinkText 2s infinite;
-        white-space: nowrap;
+        font-size: 1.5rem;                /* taille du texte */
+        font-weight: bold;                /* texte en gras */
+        color: #1abc9c;                   /* couleur verte */
+        animation: blinkText 2s infinite; /* animation de clignotement */
     }
-
     @keyframes blinkText {
-        0%   { opacity: 0; transform: translateY(-10px); }
-        50%  { opacity: 1; transform: translateY(0); }
-        100% { opacity: 0; transform: translateY(10px); }
+        0%,100% { opacity: 0; transform: translateY(-10px); }
+        50%     { opacity: 1; transform: translateY(0); }
     }
-
     .decorative-img {
-        height: 180px;
-        border-radius: 12px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        
+        height: 180px;                    /* hauteur fixe */
+        border-radius: 12px;              /* coins arrondis */
+        box-shadow: 0 0 15px rgba(0,0,0,0.2); /* ombre légère */
     }
 
+    /* ==== Section Guinée ==== */
+    .guinee-section {
+        text-align: center;               /* texte centré */
+        margin: 3rem 0;                   /* marge verticale */
+    }
+    .guinee-text {
+        max-width: 700px;                 /* largeur max pour la lecture */
+        margin: 1rem auto;                /* centré horizontalement */
+        font-size: 1.05rem;               /* taille de police confortable */
+    }
+
+    /* ==== Carrousel Chefs de Lignes ==== */
     .ligne-carousel-container {
-    position: relative;
-    max-width: 100%;
-    overflow: hidden;
-    padding: 20px;
-}
-
-.ligne-carousel {
-    display: flex;
-    gap: 20px;
-    transition: transform 0.5s ease;
-    /* scroll-behavior: smooth; */ /* ← désactive le défilement fluide automatique */
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE 10+ */
-}
-
-
-.ligne-carousel::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-}
-
-.ligne-card {
-    min-width: 250px;
-    flex-shrink: 0;
-    background-color: #f5f5f5;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    scroll-snap-align: start;
-    text-align: center;
-    padding: 15px;
-    transition: transform 0.3s;
-}
-
-.ligne-card:hover {
-    transform: scale(1.05);
-}
-
-.ligne-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 10px;
-}
-
-.chef-info h5,
-.chef-info p {
-    margin: 0;
-    font-size: 14px;
-    color: #333;
-}
-
-.carousel-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #1abc9c;
-    border: none;
-    color: white;
-    font-size: 2rem;
-    padding: 10px;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 1;
-}
-
-.prev-btn {
-    left: 10px;
-}
-
-.next-btn {
-    right: 10px;
-}
-
-@media (max-width: 768px) {
-    .ligne-card {
-        min-width: 200px;
+        position: relative;               /* pour positionner les flèches */
+        overflow: hidden;                 /* masque les parties dépassant */
+        padding: 1rem 0;                  /* espace vertical */
     }
-}
-
-
-
+    .ligne-carousel {
+        display: flex;                    /* ligne d’éléments */
+        gap: 1rem;                        /* espace entre les cartes */
+        overflow-x: auto;                 /* scroll horizontal */
+        scroll-snap-type: x mandatory;    /* "snap" pour chaque carte */
+        scrollbar-width: none;            /* masque la barre de scroll sous Firefox */
+    }
+    .ligne-carousel::-webkit-scrollbar {  /* masque la barre sous Chrome */
+        display: none;
+    }
+    .ligne-card {
+        min-width: 250px;                 /* largeur minimale de chaque carte */
+        background: #f5f5f5;              /* fond gris clair */
+        border-radius: 12px ;              /* coins arrondis */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* ombre légère */
+        scroll-snap-align: start;         /* ancre au début du scroll-snap */
+        text-align: center;               /* contenu centré */
+        padding: 1rem;                    /* espace intérieur */
+    }
+    .ligne-card img {
+        width: 100%;                      /* pleine largeur de la carte */
+        height: 400px;                    /* hauteur fixe */
+        object-fit: cover;                /* recadrage propre */
+        border-radius: 8px;               /* coins arrondis */
+        margin-bottom: .5rem;             /* espace sous l’image */
+    }
+    .chef-info h5,
+    .chef-info p {
+        margin: 0;                        /* supprime marges par défaut */
+        font-size: .9rem;                 /* taille réduite */
+        color: #333;                      /* texte gris foncé */
+    }
+    .carousel-btn {
+        position: absolute;               /* positionné par rapport à .ligne-carousel-container */
+        top: 50%;                         /* centre verticalement */
+        transform: translateY(-50%);      /* ajuste exactement le centrage vertical */
+        background: #1abc9c;              /* couleur verte */
+        border: none;                     /* pas de bordure */
+        color: white;                     /* flèche blanche */
+        font-size: 1.5rem;                /* taille de la flèche */
+        width: 2.5rem;                    /* largeur du bouton */
+        height: 2.5rem;                   /* hauteur du bouton */
+        border-radius: 50%;               /* rond */
+        cursor: pointer;                  /* curseur pointeur */
+        z-index: 1;                       /* passe devant le contenu */
+    }
+    .prev-btn { left: .5rem; }            /* bouton "précédent" à gauche */
+    .next-btn { right: .5rem; }           /* bouton "suivant" à droite */
 </style>
-   
 
+<div class="publicite-container">
 
-<!-- En-tête -->
-<div class="site-header">
-    <!-- Logo centré avec texte -->
-    <div class="left">
-        <img src="{{ asset('storage/photos/logo.jpg') }}" class="logo" alt="Logo">
-        <span class="title">Centre d'information Motards</span>
-    </div>
-   
-    <h1 class="welcome-text">COMMUNE URBAINE DE DUBREKA</h1>
-
-    <!-- Deux photos + contact dessous -->
-    <div class="right">
-        <div class="photo-row">
-            <img src="{{ asset('storage/photos/sadjo1.jpg') }}" class="photo-cadre" alt="Image 1">
-            <img src="{{ asset('storage/photos/sadjo2.jpg') }}" class="photo-cadre" alt="Image 2">
+    <!-- En-tête principal -->
+    <div class="site-header">
+        <!-- Colonne de gauche : logo + titre -->
+        <div class="left">
+            <img src="{{ asset('storage/photos/logo.jpg') }}" class="logo" alt="Logo">
+            <div class="title">Centre d'information Motards</div>
         </div>
-        <!-- Contact placé sous les photos -->
-        <a href="mailto:sadjosow187@gmail.com" class="contact-link text-contact">
-            📧 sadjosow187@gmail.com
-        </a>
-        <p class="text-contact"><strong>Téléphone : +224 628416997</strong></p>
+        <!-- Texte central : nom de la commune -->
+        <h1 class="welcome-text">COMMUNE URBAINE DE DUBREKA</h1>
+        <!-- Colonne droite dans le header -->
+<div class="right col-12 col-md-4 text-center">
+  <!-- on utilise d-flex + justify-content-center pour centrer -->
+  <div class="d-flex justify-content-center mb-2">
+    <img src="{{ asset('storage/photos/sadjo1.jpg') }}"
+         class="photo-cadre mx-1"
+         alt="Sadjo 1">
+    <img src="{{ asset('storage/photos/sadjo2.jpg') }}"
+         class="photo-cadre mx-1"
+         alt="Sadjo 2">
+  </div>
+  <a href="mailto:sadjosow187@gmail.com" class="contact-link d-block mb-1">
+    📧 sadjosow187@gmail.com
+  </a>
+  <div class="contact-phone">📞 +224 628 416 997</div>
+</div>
     </div>
-</div>
 
-<!-- Section fond fixe -->
-<div class="hero-section">
-    <h1>Site d'information Motards Certifiée</h1>
-</div>
+    <!-- Section "Hero" : image de fond + titre -->
+    <div class="hero-section">
+        <h1>Site d'information Motards Certifiée</h1>
+    </div>
 
-<p>
-Bienvenue sur le site officiel des motards de la Commune Urbaine de Dubréka.  
-Nous sommes fiers de représenter une communauté dynamique, disciplinée et engagée pour le bien-être de tous.  
-Chaque jour, nos motards parcourent les routes avec courage et dévouement, veillant à la sécurité et à la fluidité de la circulation pour tous les citoyens.
+    <!-- Petit paragraphe d’introduction centré -->
+    <p class="intro-text">
+        Bienvenue dans votre guide ultime des motards de Dubréka !<br>
+        Actualités exclusives, portraits de passionnés et conseils de pros : tout pour rouler en confiance.
+    </p> <br>
+    <p class="text-center">Chaque matin vous offre une nouvelle chance de vous réinventer : saisissez-la avec gratitude. Devenez le héros de votre propre aventure, avec pour seule limite l’horizon de votre imagination. La détermination que vous incarnez est capable de transformer l’impossible en possible, pas à pas. Avancez avec passion et confiance, et vous verrez que les résultats suivront naturellement. Vos talents sont uniques et précieux : n’hésitez pas à les partager généreusement avec le monde. Ne sous-estimez jamais le pouvoir d’un rêve alimenté par une action résolue. Vivez chaque instant avec intensité, présence et gratitude, car c’est là que résident les plus grands trésors. Poursuivez vos idées jusqu’au bout, elles sont l’expression vivante de votre potentiel illimité. L’optimisme, lorsqu’il est cultivé chaque jour, devient le moteur des plus belles réussites. Vous détenez entre vos mains le pouvoir de façonner l’avenir : prenez-en la mesure et agissez. Semez aujourd’hui les graines de vos succès de demain, en prenant soin de chaque détail. Osez prendre confiance en vous, car votre capacité à réussir est sans borne. Les plus belles victoires naissent souvent des défis les plus redoutables : souriez-leur. Accueillez chaque obstacle comme une occasion de vous fortifier et de faire valoir votre caractère. Donnez toujours le meilleur de vous-même, sans compromis, et vous brillerez de mille feux. Votre grande aventure commence maintenant : avancez avec cœur, courage et enthousiasme infini.</p>
 
-Être motard à Dubréka, c’est bien plus qu’un simple métier : c’est une vocation, un engagement de cœur envers sa communauté.  
-Nos équipes incarnent l’esprit de solidarité, de responsabilité et de respect qui font la fierté de notre commune.
-
-Nous croyons en une jeunesse motivée, en des leaders exemplaires et en une société unie autour de valeurs fortes.  
-Nos motards sont formés pour agir avec rapidité, rigueur et respect, que ce soit lors des grands événements officiels ou au quotidien dans les quartiers.
-
-Chaque klaxon est un appel à la vigilance, chaque trajectoire un symbole de discipline et de respect des règles.  
-Nous saluons le professionnalisme et l'esprit de famille qui animent chacun de nos motards.
-
-Explorez ce site pour mieux connaître nos équipes, nos missions et nos engagements.  
-Merci de votre visite et bonne découverte ! 🚀
-</p>
-
-<!-- Section Nos Responsables -->
-<div class="nos-formations-section position-relative">
-    <div class="container content-section text-center">
-        <h2 class="mb-4"><strong>Le Maire</strong></h2>
+    <!-- Section "Le Maire" -->
+    <div class="nos-formations-section">
+        <h2 class="text-center mb-5">Le Maire</h2>
         <div class="row justify-content-center">
-        @foreach($mairePhotos as $index => $photo)
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 formation-box">
-        <img src="{{ asset('storage/photos/' . $photo) }}" class="formation-img" alt="Formation">
-        <p class="mt-2 text-white text-center" style="font-weight:bold;">
-            {{ $commentaires[$index] ?? 'Description non disponible' }}
-        </p>
-    </div>
-@endforeach
-<p>Hommage à Nos Motards
-Les motards de la Commune Urbaine de Dubréka ne sont pas de simples conducteurs. Ils sont les gardiens du mouvement, les veilleurs du quotidien, ceux qui bravent le vent et la pluie pour transporter, protéger, guider et parfois même sauver. Leur rôle dépasse le guidon : ils sont des piliers sociaux, des relais entre les quartiers, des figures respectées dans nos rues.
-
-Une discipline, une fierté
-Chaque casque porté est un symbole de responsabilité. Chaque klaxon, un signal d’attention. Nos motards sont formés, encadrés et inspirés par un seul objectif : servir la population dans la dignité et le respect des règles. Leur présence rassure, leur organisation impressionne. Nous les saluons pour leur ponctualité, leur esprit d’équipe et leur sens élevé du devoir.
-
-Unis comme un moteur bien réglé
-Qu’il s’agisse d’encadrer une cérémonie officielle, de participer à une mission humanitaire, ou simplement de traverser les artères de la commune pour informer et sensibiliser, les motards sont toujours présents, solidaires et organisés. Ils roulent ensemble, se protègent mutuellement et veillent au bon déroulement de chaque activité. Leur devise : Ensemble, plus loin, plus fort.
-
-Merci, chers motards
-À tous les motards de notre commune, à ceux qui donnent sans compter, qui sillonnent nos routes de jour comme de nuit, nous vous disons MERCI. Votre courage, votre endurance et votre engagement sont une source d’inspiration. Nous sommes fiers de vous compter parmi les bâtisseurs silencieux mais puissants de Dubréka. Vous êtes nos moteurs humains.
-
-Les Motards : Héros de Nos Routes
-Nos motards sont les héros discrets de la Commune Urbaine de Dubréka. Jour après jour, ils sillonnent nos rues, portant non seulement leur passion pour la moto mais aussi une responsabilité immense. Ils sont les yeux et les oreilles de la communauté, veillant à la sécurité de tous tout en restant à l'écoute des besoins de la population. Leur rôle est essentiel, leur engagement inébranlable.
-
-Une Passion au Service de la Communauté
-Chaque motard incarne bien plus qu'un simple conducteur. Ils sont des ambassadeurs de la sécurité, des membres actifs qui participent à la bonne marche de notre commune. Ils sont là pour guider, transporter, et protéger. Que ce soit lors d’événements officiels, de missions urgentes ou d’activités de routine, leur présence est un gage de fiabilité et de réactivité.
-
-Des Moto-Patrouilles pour Votre Sécurité
-Les patrouilles de motards sont une partie intégrante du dispositif de sécurité publique. Grâce à leur mobilité et leur capacité à se faufiler dans les embouteillages, les motards peuvent rapidement intervenir en cas de besoin. Leur rôle est de maintenir l’ordre, faire respecter les règles, et assurer une présence visible dans les lieux publics et lors des événements communautaires. Leur travail n’est pas seulement une profession, c’est une vocation.
-
-Un Engagement Sans Limites
-Les motards de Dubréka sont des hommes et des femmes qui ne connaissent pas de limites. Qu’il pleuve, qu’il vente ou qu’il fasse une chaleur étouffante, ils sont toujours là, prêts à rouler pour la communauté. Leur courage, leur détermination et leur sens du devoir font d’eux des modèles pour les jeunes générations.
-
-Nous Vous Rendons Hommage
-À tous nos motards, vous êtes une partie intégrante de notre quotidien. Grâce à vous, nous nous sentons plus sûrs, plus connectés et plus engagés dans la vie communautaire. Vos efforts sont une source de respect et de gratitude. Nous vous rendons hommage et vous remercions pour tout ce que vous faites pour la Commune Urbaine de Dubréka.</p>
-            </div> <!-- Fin de la boucle des responsables -->
-        
-<@php
-    $staffs = [
-        'commune2.jpg' => "Le groupe sécurité veille à la discipline et à la sécurité des événements organisés.
-        
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.",
-        
-        'commune3.jpg' => "L’équipe technique assure le bon fonctionnement des équipements et du matériel. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.",
-        
-        'commune4.jpg' => "Les responsables des relations publiques communiquent avec les autorités et partenaires. 
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde ea laboriosam architecto voluptate nihil. Ea maiores est nostrum illo, a tempore eveniet ex quis eum sint temporibus minus cumque soluta.",
-        'commune5.jpg' => "Le staff d’organisation s’occupe des itinéraires et du timing des cortèges.
-        ✅ Engagement communautaire
-À Dubréka, chaque citoyen est un maillon essentiel de notre développement. Nos groupes de motards, nos encadreurs, nos staffs techniques et administratifs travaillent main dans la main pour bâtir une communauté forte, solidaire et innovante. Chaque événement, chaque sortie, chaque rencontre est une opportunité de renforcer les liens sociaux et de promouvoir la paix et la sécurité.
-
-",
-        'commune.jpg'  => "Les animateurs mettent de l’ambiance et motivent les motards lors des événements.
-        ✅ Unis pour le progrès
-Le progrès ne se mesure pas uniquement à travers les infrastructures, mais aussi par la qualité de l’unité qui règne au sein d’une commune. Nos équipes s’engagent quotidiennement pour faire rayonner la Commune Urbaine de Dubréka, en valorisant nos talents locaux, en formant les jeunes, et en assurant un cadre de vie digne et respectueux pour tous.",
-        'commune7.jpg' => "L’équipe logistique transporte les outils, les supports et s’occupe des installations.",
-        'commune8.jpg' => "Les encadreurs accompagnent les nouveaux et veillent à une bonne intégration.
-        ✅ Le motard citoyen
-Être motard à Dubréka, ce n’est pas seulement conduire une moto. C’est appartenir à un réseau de citoyens engagés, respectueux du code de la route, protecteurs des plus faibles et toujours disponibles pour servir la communauté. Par leur discipline et leur solidarité, nos motards incarnent les valeurs les plus nobles de la co",
-        'commune3.jpg' => "Les superviseurs coordonnent les actions entre les groupes et interviennent si besoin."
-    ];
-@endphp
-
-<h2 class="mb-4 mt-5 text-center"><strong>Nos Staffs / Groupe</strong></h2>
-<div class="row justify-content-center">
-    @foreach($staffs as $photo => $commentaire)
-        <div class="col-6 col-sm-4 col-md-3 mb-4 d-flex flex-column align-items-center">
-            <div class="card shadow-sm border-0 w-100">
-                <img src="{{ asset('storage/photos/' . $photo) }}" class="card-img-top rounded" style="height: 300px; object-fit: cover;" alt="Staff">
-            </div>
-            <p class="mt-2 text-center small" style="max-width: 100%;">{{ $commentaire }}</p>
-        </div>
-    @endforeach
-</div>
-
-    <strong>Jolie N'est Ce Pas?</strong>
-    <!-- Petite image décorative en bas -->
-    <div class="animated-section text-center">
-    <div class="animated-text">🚖 TAXI MOTO</div>
-    <img src="{{ asset('storage/photos/moto.jpg') }}" alt="Décoration" class="decorative-img">
-    <div class="animated-text">TAXI MOTO 🚖</div>
-</div>
-
-
-           
+            @foreach($mairePhotos as $i => $photo)
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 formation-box">
+                    <img src="{{ asset('storage/photos/'.$photo) }}" class="formation-img" alt="Photo du Maire">
+                    <p>{{ $commentaires[$i] }}</p>
+                </div>
+            @endforeach
         </div>
     </div>
-</div>
-<div class="d-flex justify-content-center my-4">
-    <img src="{{ asset('storage/photos/G.webp') }}" alt="Guinee" class="decorative-img">
-    
-</div>
-<h1 class="text-center">Guinee</h1>
-
-<p>L'Aventure et la Liberté : La Vie de Motard
-Être motard, ce n’est pas seulement conduire une moto, c’est vivre une aventure quotidienne. Chaque route devient un nouveau défi, chaque virage une opportunité d’explorer. La liberté que procure la moto est incomparable, une sensation unique qui rapproche les motards de la route et du monde. Quand tu enfourches ta moto, tu deviens le maître de ton chemin, et rien n’est plus gratifiant.
-
-Les Motards : Des Ambassadeurs de la Route
-Les motards ne sont pas seulement des conducteurs ; ils sont des ambassadeurs de la route, prônant des valeurs de respect, de sécurité et de convivialité. En tant que motard, tu es un modèle pour tous ceux qui t’entourent. Ton comportement sur la route inspire, et ton respect des règles encourage les autres à faire de même. La moto n’est pas un simple moyen de transport, c’est un mode de vie, un engagement à préserver l’ordre et à défendre la sécurité sur nos routes.
-
-Rester Fort dans les Moments Difficiles
-La vie d’un motard n’est pas toujours simple. Parfois, les conditions de circulation peuvent être difficiles, parfois même dangereuses. Mais un vrai motard ne se laisse jamais abattre par les obstacles. Au contraire, ces moments sont une preuve de force et une occasion de se surpasser. Les motards savent que chaque défi est une chance de grandir et de devenir meilleur.
-
-L'Esprit d'Équipe et la Fraternité des Motards
-Les motards partagent plus qu'une passion, ils partagent une fraternité. En dehors des routes, un motard peut toujours compter sur un autre motard. La solidarité est au cœur de la communauté des motards. Dans chaque rencontre, il y a un esprit d’entraide, une volonté de s’entraider dans les moments difficiles. Que ce soit pour des conseils mécaniques, des astuces de conduite ou simplement pour partager un bon moment, les motards sont toujours là pour les autres.
-
-La Route Est un Terrain de Jeu pour les Motards
-La route n’est pas simplement un trajet d’un point A à un point B. Pour les motards, la route est un terrain de jeu, un lieu où chaque virage est une occasion de tester ses limites et de ressentir l’adrénaline. C’est dans cet environnement que les motards se sentent vivants, où leur passion et leur compétence sont mises à l’épreuve à chaque instant. Mais la route est aussi un terrain de respect, où les motards doivent être vigilants, responsables et toujours conscients des autres usagers.
-
-Vivre sa Passion avec Intensité
-Être motard, c’est vivre avec intensité. C’est ressentir chaque moment sur la route comme un instinct, une véritable passion. C’est donner tout ce que l’on a à chaque trajet, en cherchant toujours à se perfectionner et à vivre pleinement sa passion. La moto n’est pas seulement un hobby, c’est un art de vivre, une manière de se connecter à soi-même et au monde qui nous entoure.
-
-</p>
-
-<h1 class="text-center my-5" style="color: #1abc9c; font-weight: bold;">Les Chefs De Lignes</h1>
-<p class="text-center">Pour Touts Besoin Veuillez Contacter les chefs de ligne </p>
-
-<div class="ligne-carousel-container">
-    <button class="carousel-btn prev-btn">&#10094;</button>
-
-    <div class="ligne-carousel" id="ligneCarousel">
-        @php
-            $chefs = [
-                ['image' => 'chef1.jpg', 'nom' => 'Ibrahima Sory Kaba', 'tel' => '624 05 04 05 /623 05 40 77', 'poste' => 'Chef de la Ligne Centrale'],
-                ['image' => 'chef2.jpg', 'nom' => 'Amadou Djouldé Diallo', 'tel' => '621 96 99 83 /662 72 51 84', 'poste' => 'Chef de la Ligne Bleu Zone (km36)'],
-                ['image' => 'chef3.jpg', 'nom' => 'Mamadou Oury Bah', 'tel' => '628 86 09 01 /662 58 95 20', 'poste' => 'Chef de la Ligne Tobolou'],
-                ['image' => 'chef4.jpg', 'nom' => 'Mamadou Saliou Sow', 'tel' => '626 03 32 22', 'poste' => 'Chef de la Ligne Grand Moulin'],
-                ['image' => 'chef5.jpg', 'nom' => 'Amadou Daye Diallo', 'tel' => '622 11 48 22 /664 34 15 21', 'poste' => 'Chef de la Ligne T13'],
-                ['image' => 'chef6.jpg', 'nom' => 'Souleymane Sow', 'tel' => '624 24 17 95', 'poste' => 'Chef de la Ligne Unie Diomant'],
-                ['image' => 'chef7.jpg', 'nom' => 'Souleymane Diallo', 'tel' => '612 52 40 79', 'poste' => 'Chef de la Ligne Kalemah'],
-                ['image' => 'chef8.jpg', 'nom' => 'Mohamed Sylla', 'tel' => '626 89 25 89 /662 30 82 49 ', 'poste' => 'Chef de la Ligne Samatran'],
-                ['image' => 'chef9.jpg', 'nom' => 'Amadou Oury Bah', 'tel' => '628 14 61 88', 'poste' => 'Chef de la Ligne T9'],
-                ['image' => 'chef10.jpg', 'nom' => 'Alhassane Diallo', 'tel' => '622 58 55 68', 'poste' => 'Chef Adjoint T10'],
-                ['image' => 'chef11.jpg', 'nom' => 'Mamadou Samba Bah', 'tel' => '626 02 48 02', 'poste' => 'Chef de la Ligne Centrale (Adjoint)'],
-                ['image' => 'chef12.jpg', 'nom' => 'Mamadou Sanoussy Diallo', 'tel' => '626 87 66 45', 'poste' => 'Chef de la Ligne Carrefour Georges'],
-                ['image' => 'chef13.jpg', 'nom' => 'Elhadj Thiouto Bah', 'tel' => '622 29 63 54', 'poste' => 'Tresorier de Bureau Communal'],
-                ['image' => 'chef14.jpg', 'nom' => 'Mamadou Yéro Bah', 'tel' => '620 02 97 59', 'poste' => 'Chef de la Ligne Ansoumania (2ieme)'],
-            ];
-           
-        @endphp
-
-        @foreach($chefs as $chef)
-        <div class="ligne-card">
-            <img src="{{ asset('storage/photos/' . $chef['image']) }}" alt="{{ $chef['nom'] }}">
-            <div class="chef-info">
-                <h5>Nom : {{ $chef['nom'] }}</h5>
-                <p>Téléphone : {{ $chef['tel'] }}</p>
-                <p>{{ $chef['poste'] }}</p>
+       <p class="text-center">Vos actes d’aujourd’hui constituent la fondation de l’avenir que vous construisez : choisissez-les avec soin et courage. Osez rêver grand et, surtout, osez agir maintenant pour que vos rêves ne restent pas de simples chimères. Votre détermination, solide comme une armure, est le super-pouvoir qui vous permettra de relever n’importe quel défi. Chaque revers que vous vivez est une leçon précieuse : accueillez-le, tirez-en la sagesse nécessaire et repartez plus fort que jamais. Écrivez votre histoire avec authenticité et audace, en mêlant passion et persévérance à chaque chapitre. La passion qui brûle dans votre cœur est cette étincelle capable d’enflammer votre route vers le succès. Osez sortir des sentiers battus, car c’est là, hors de votre zone de confort, que se cachent les plus grandes beautés. Ne mettez aucune limite à vos rêves : laissez-les vous guider vers des horizons infinis. Soyez fier de chaque petite avancée, car c’est l’accumulation de ces pas modestes qui conduit aux plus hautes montagnes. L’enthousiasme que vous portez est une force contagieuse : partagez-le et vous verrez votre entourage s’enflammer à son tour. Fixez-vous des objectifs ambitieux et poursuivez-les avec ferveur. La confiance en soi se forge comme un muscle : exercez-la, renforcez-la et observez-la grandir en puissance. Accueillez le changement comme un vieil ami : il est le compagnon fidèle de toute évolution durable. Célébrez chacune de vos réussites, même les plus modestes, car elles sont le signe tangible de vos efforts. La clarté de vos intentions est le fil d’or qui guide chacun de vos pas vers la réalisation. La persévérance rend possible l’extraordinaire là où beaucoup s’arrêtent à la première difficulté.</p>
+    <!-- Section "Nos Staffs / Groupe" -->
+    <h2 class="mt-5 mb-4 text-center" style="color:#1abc9c;">Nos Staffs / Groupe</h2>
+    @php
+        $staffs = [
+            'commune2.jpg' => "Sécurité & Sérénité : nos motards veillent jour et nuit à votre tranquillité.",
+            'commune3.jpg' => "Technique & Innovation : équipement toujours fiable pour tous les défis.",
+            'commune4.jpg' => "Communication & Convivialité : chaque échange renforce notre communauté.",
+            'commune5.jpg' => "Organisation & Dynamisme : événements parfaitement orchestrés.",
+            'commune.jpg'  => "Ambiance & Passion : moments inoubliables et haute énergie.",
+            'commune7.jpg' => "Logistique & Rapidité : transport des équipements sans retard.",
+            'commune8.jpg' => "Solidarité & Encadrement : formation et soutien à chaque nouveau.",
+        ];
+    @endphp
+    <div class="row gx-4 gy-4 justify-content-center">
+        @foreach($staffs as $photo => $texte)
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="staff-card">
+                    <img src="{{ asset('storage/photos/'.$photo) }}" alt="Photo staff">
+                    <p>{{ $texte }}</p>
+                </div>
             </div>
-        </div>
         @endforeach
     </div>
 
-    <button class="carousel-btn next-btn">&#10095;</button>
+    <!-- Taxi Moto centré : colonne en mobile, ligne en desktop -->
+<div class="d-flex flex-column flex-sm-row justify-content-center align-items-center text-center py-3">
+  <!-- Sur mobile : marge en bas ; sur sm+ : plus d’espace à droite -->
+  <div class="animated-text mb-2 mb-sm-0 me-sm-3">
+    
+  </div>
+
+  <!-- L’image se centre automatiquement grâce à mx-auto et d-block -->
+  <img src="{{ asset('storage/photos/moto.jpg') }}"
+       class="decorative-img d-block mx-auto"
+       alt="Taxi Moto">
+
+  <!-- Sur mobile : marge en haut ; sur sm+ : plus d’espace à gauche -->
+  <div class="animated-text mt-2 mt-sm-0 ms-sm-3">
+    
+  </div>
+</div>
+      <p class="text-center">Osez faire le premier pas avec confiance et détermination, car la magie de toute réussite naît toujours de ce simple geste qui brise la glace et ouvre la porte à des opportunités insoupçonnées. Chaque défi se présente à vous comme une occasion précieuse de sortir grandement de votre zone de confort et d’élever votre regard vers des sommets que vous n’auriez jamais imaginés. Croyez en vous et en la force incroyable qui sommeille au fond de votre cœur, car votre potentiel est une source inépuisable de ressources et de créativité. Chaque nouveau matin se lève comme une page blanche, prête à être remplie de vos actions, de votre passion et de vos rêves les plus audacieux. L’audace vous offre le cadeau précieux de franchir des seuils où la peur aurait préféré fermer toutes les portes : ouvrez-vous sans hésiter à l’inconnu. Souriez à la vie avec un enthousiasme contagieux, et vous verrez qu’elle vous rendra cette énergie positive décuplée à chaque instant. Alimentez vos rêves comme on entretient une flamme sacrée, sans jamais laisser la moindre étincelle s’éteindre au gré des doutes. La réussite, loin d’être un privilège réservé à quelques élus, appartient à ceux qui persévèrent avec constance, même quand tous les signaux semblent au rouge. Un pas, même modeste, constitue le point de départ d’une chaîne de succès : osez avancer aujourd’hui pour récolter les victoires de demain. Cultivez la confiance en vous comme on cultive un jardin : arrosez-la chaque jour, protégez-la des mauvaises herbes du doute et elle fleurira à l’infini. L’énergie positive que vous émettez attire les opportunités extraordinaires : soyez ce phare lumineux dans la nuit de l’incertitude. Chaque obstacle se transforme, entre vos mains, en un tremplin solide qui vous propulse vers un niveau supérieur de compétence et de fierté. Prenez conscience de la force infinie qui réside en vous, car rien n’est plus puissant que la volonté d’un esprit déterminé. La persévérance est la clé d’or qui déverrouille toutes les portes verrouillées par l’adversité : gardez-la toujours à portée de main. Respirez profondément, alignez votre esprit et votre cœur, puis foncez vers vos objectifs avec une clarté renouvelée. Transformez chacun de vos doutes en une source d’élan, un carburant qui propulse votre motivation toujours plus loin. Réveillez chaque jour votre potentiel endormi et laissez-le rayonner haut et fort.</p>
+      
+    <!-- Section "Guinée" -->
+    <div class="guinee-section">
+        <img src="{{ asset('storage/photos/G.webp') }}" class="decorative-img mb-3" alt="Guinée">
+        <h2>Guinée</h2>
+        <p class="guinee-text">
+            Partez à la découverte de nos routes sinueuses et de panoramas grandioses.<br>
+            Rejoignez la communauté, vivez l’aventure motarde !
+        </p>
+    </div>
+
+    <!-- Section "Les Chefs De Lignes" avec carousel -->
+    <h2 class="text-center my-5" style="color:#1abc9c;">Les Chefs De Lignes</h2>
+    <p class="text-center mb-4">Contactez-les pour toute question ou assistance</p>
+    <div class="ligne-carousel-container">
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <div class="ligne-carousel" id="ligneCarousel">
+            @php
+                $chefs = [
+                    ['image'=>'chef1.jpg','nom'=>'Ibrahima Sory Kaba','tel'=>'624050405 / 623054077','poste'=>'Chef de la Ligne Centrale'],
+                    ['image'=>'chef2.jpg','nom'=>'Amadou Djouldé Diallo','tel'=>'621969983 / 662725184','poste'=>'Chef Ligne Bleu (km36)'],
+                    ['image'=>'chef3.jpg','nom'=>'Mamadou Oury Bah','tel'=>'628860901 / 662589520','poste'=>'Chef Ligne Tobolou'],
+                    ['image'=>'chef4.jpg','nom'=>'Mamadou Saliou Sow','tel'=>'626033222','poste'=>'Chef Ligne Grand Moulin'],
+                    ['image'=>'chef5.jpg','nom'=>'Amadou Daye Diallo','tel'=>'622114822 / 664341521','poste'=>'Chef Ligne T13'],
+                    ['image'=>'chef6.jpg','nom'=>'Souleymane Sow','tel'=>'624241795','poste'=>'Chef Ligne Unie Diomant'],
+                    ['image'=>'chef7.jpg','nom'=>'Souleymane Diallo','tel'=>'612524079','poste'=>'Chef Ligne Kalemah'],
+                    ['image'=>'chef8.jpg','nom'=>'Mohamed Sylla','tel'=>'626892589 / 662308249','poste'=>'Chef Ligne Samatran'],
+                    ['image'=>'chef9.jpg','nom'=>'Amadou Oury Bah','tel'=>'628146188','poste'=>'Chef Ligne T9'],
+                    ['image'=>'chef10.jpg','nom'=>'Alhassane Diallo','tel'=>'622585568','poste'=>'Chef Adjoint T10'],
+                    ['image'=>'chef11.jpg','nom'=>'Mamadou Samba Bah','tel'=>'626024802','poste'=>'Chef de Ligne Centrale (Adjoint)'],
+                    ['image'=>'chef12.jpg','nom'=>'Mamadou Sanoussy Diallo','tel'=>'626876645','poste'=>'Chef Carrefour Georges'],
+                    ['image'=>'chef13.jpg','nom'=>'Elhadj Thiouto Bah','tel'=>'622296354','poste'=>'Trésorier Bureau Communal'],
+                    ['image'=>'chef14.jpg','nom'=>'Mamadou Yéro Bah','tel'=>'620029759','poste'=>'Chef Ligne Ansoumania (2ᵉ)'],
+                ];
+            @endphp
+            @foreach($chefs as $c)
+                <div class="ligne-card">
+                    <img src="{{ asset('storage/photos/'.$c['image']) }}" alt="Photo {{ $c['nom'] }}">
+                    <div class="chef-info">
+                        <h5>{{ $c['nom'] }}</h5>
+                        <p>{{ $c['poste'] }}</p>
+                        <p><strong>{{ $c['tel'] }}</strong></p>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        <button class="carousel-btn next-btn">&#10095;</button>
+    </div>
+
 </div>
 
-
-
-
-<!-- Animation des blocs -->
+<!-- Scripts d’animation et carousel -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const boxes = document.querySelectorAll('.formation-box');
-        const showBoxes = () => {
-            boxes.forEach(box => {
-                const boxTop = box.getBoundingClientRect().top;
-                const windowHeight = window.innerHeight;
-                if (boxTop < windowHeight - 100) {
-                    box.classList.add('show');
-                }
-            });
-        };
-        window.addEventListener('scroll', showBoxes);
-        showBoxes();
+document.addEventListener('DOMContentLoaded', () => {
+    // Fade-in des blocs "Le Maire"
+    document.querySelectorAll('.formation-box').forEach(box => {
+        const obs = new IntersectionObserver(
+            ([entry]) => entry.isIntersecting && box.classList.add('show'),
+            { threshold: .2 }
+        );
+        obs.observe(box);
     });
+    // Commandes du carousel des chefs de lignes
+    const carousel = document.getElementById('ligneCarousel');
+    document.querySelector('.prev-btn').onclick = () => carousel.scrollBy({ left: -300, behavior: 'smooth' });
+    document.querySelector('.next-btn').onclick = () => carousel.scrollBy({ left: 300, behavior: 'smooth' });
+});
 </script>
 
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const carousel = document.getElementById('ligneCarousel');
-        const prevBtn = document.querySelector('.prev-btn');
-        const nextBtn = document.querySelector('.next-btn');
-
-        prevBtn.addEventListener('click', () => {
-            carousel.scrollBy({ left: -300, behavior: 'smooth' });
-        });
-
-        nextBtn.addEventListener('click', () => {
-            carousel.scrollBy({ left: 300, behavior: 'smooth' });
-        });
-    });
-</script>
-
-
-@endsection
+@endsection  {{-- Fin de la section "content" --}}

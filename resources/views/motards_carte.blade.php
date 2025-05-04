@@ -66,6 +66,7 @@
 
         {{-- Affiche le matricule du motard --}}
         <div class="matricule">Matricule : {{ $motard->matricule }}</div>
+        
 
         {{-- Génération du QR Code avec les infos du motard --}}
         <div class="qr">

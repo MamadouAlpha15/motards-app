@@ -36,17 +36,28 @@
     @if (!isset($hideHeader))
 <header>
     @if(Auth::check())
-        <div class="text-end me-3">
+
+    <div class="d-flex justify-content-end align-items-center gap-2 me-3 mb-2">
+            {{-- Lien vers création admin --}}
+            {{-- Afficher le bouton "Créer un Admin" sauf sur la page d'inscription --}}
+          @if (!Request::is('register'))
+           <a href="{{ route('register') }}" class="btn btn-sm btn-success">
+             <i class="fas fa-user-plus"></i> Créer un Admin
+          </a>
+    @endif
+
+        
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button class="btn btn-sm btn-danger">Déconnexion</button>
             </form>
-        </div>
+       </div>
     @endif
+    <br>
 
-    @if(auth()->check() && auth()->user()->is_admin)
-        <a href="{{ route('admin.settings') }}">Paramètres Admin</a>
-    @endif
+    @if(auth()->check() && auth()->user()->is_admin && !Request::is('register'))
+    <a href="{{ route('admin.settings') }}">Paramètres Admin</a>
+@endif
 
     <h1>Gestion des Motards</h1>
 </header>

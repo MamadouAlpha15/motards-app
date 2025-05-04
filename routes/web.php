@@ -1,97 +1,65 @@
 <?php
 
-// Importation des classes nécessaires
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MotardController;
 use App\Http\Controllers\AdminOnlyController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Fichier pour définir toutes les routes web de l'application.
-| Chargé automatiquement par Laravel.
-|
-*/
+// Page d’accueil redirige vers publicité
+Route::get('/', fn () => redirect()->route('motards.pub'));
 
-// Quand on accède à la racine du site ("/"), on redirige vers la page publicité
-Route::get('/', function () {
-    return redirect()->route('motards.pub');
-});
+// Page de login
+Route::get('/login', fn () => view('auth_login'))->name('login')->middleware('guest');
 
-// Affiche le formulaire de connexion
-Route::get('/login', function () {
-    return view('auth_login');
-})->name('login')->middleware('guest'); // Accessible uniquement pour les invités (non connectés)
-
-// Traitement des données du formulaire de connexion
+// Authentification
 Route::post('/login', function (Request $request) {
-    $credentials = $request->only('email', 'password'); // Récupère email et mot de passe
-
-    // Vérifie si les informations sont correctes
+    $credentials = $request->only('email', 'password');
     if (Auth::attempt($credentials)) {
-        $request->session()->regenerate(); // Regénère la session pour sécurité
-        return redirect()->intended('/liste'); // Redirige vers la liste des motards
+        $request->session()->regenerate();
+        return redirect()->intended('/liste');
     }
-
-    // Si échec, retourne au formulaire avec une erreur
-    return back()
-        ->withErrors([
-            'email' => 'Email incorrect ou mot de passe incorrect.',
-        ])
-        ->withInput();
+    return back()->withErrors(['email' => 'Email incorrect ou mot de passe incorrect.'])->withInput();
 })->name('login');
 
-// Déconnexion de l'utilisateur
+// Déconnexion
 Route::post('/logout', function (Request $request) {
-    Auth::logout(); // Déconnecte l'utilisateur
-    $request->session()->invalidate(); // Invalide la session actuelle
-    $request->session()->regenerateToken(); // Regénère un nouveau token CSRF
-    return redirect('/login'); // Redirige vers la page de connexion
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect('/login');
 })->name('logout');
 
-// Routes accessibles uniquement par les administrateurs connectés
+// Routes protégées par auth + admin
 Route::middleware(['auth', 'admin'])->group(function () {
 
-    // Affiche la liste des motards
+    // Gestion motards
     Route::get('/liste', [MotardController::class, 'index'])->name('motards.index');
-
-    // Formulaire pour ajouter un nouveau motard
     Route::get('/motards/create', [MotardController::class, 'create'])->name('motards.create');
-
-    // Enregistrement du nouveau motard
     Route::post('/motards', [MotardController::class, 'store'])->name('motards.store');
+    Route::get('/motards/{id}/edit', [MotardController::class, 'edit'])->name('motards.edit');
+    Route::put('/motards/{id}', [MotardController::class, 'update'])->name('motards.update');
+    Route::delete('/motards/{id}', [MotardController::class, 'destroy'])->name('motards.destroy');
+    Route::POST('/motards/delete-selected', [MotardController::class, 'deleteSelected'])->name('motards.deleteSelected');
+    Route::get('/motards/imprimer-selection', [MotardController::class, 'imprimerSelection'])->name('motards.imprimerSelection');
 
-    // Formulaire de modification des paramètres admin
+    // Paramètres admin
     Route::get('/admin/settings', [AdminOnlyController::class, 'edit'])->name('admin.settings');
-
-    // Traitement de la mise à jour des paramètres admin
     Route::post('/admin/settings', [AdminOnlyController::class, 'update'])->name('admin.settings.update');
 
-    // Formulaire d'édition des informations d'un motard
-    Route::get('/motards/{id}/edit', [MotardController::class, 'edit'])->name('motards.edit');
+    // Création admin
+    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/saved', [RegisteredUserController::class, 'store'])->name('user.store');
 
-    // Mise à jour des informations d'un motard
-    Route::put('/motards/{id}', [MotardController::class, 'update'])->name('motards.update');
-
-    // Suppression d'un motard
-    Route::delete('/motards/{id}', [MotardController::class, 'destroy'])->name('motards.destroy');
+    // Liste des administrateurs
+    Route::get('/admin/liste', [AdminController::class, 'index'])->name('admin.liste');
+    Route::delete('/admin/{id}', [AdminController::class, 'destroy'])->name('admin.supprimer');
 });
 
-// Page publique de publicité/information sur les motards
+// Vues publiques
 Route::get('/pub', [MotardController::class, 'publicite'])->name('motards.pub');
-
-// Génération du QR code pour un motard spécifique
 Route::get('/motards/{id}/qr', [MotardController::class, 'qr'])->name('motards.qr');
-
-// Génération de la carte imprimable d'un motard
 Route::get('/motards/{slug}/carte', [MotardController::class, 'carte'])->name('motards.carte');
-
-// Affiche la fiche publique d'un motard via son slug
 Route::get('/motards/{slug}', [MotardController::class, 'show'])->name('motards.show');
