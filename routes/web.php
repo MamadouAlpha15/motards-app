@@ -49,13 +49,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/settings', [AdminOnlyController::class, 'edit'])->name('admin.settings');
     Route::post('/admin/settings', [AdminOnlyController::class, 'update'])->name('admin.settings.update');
 
-    // Création admin
-    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
-    Route::post('/saved', [RegisteredUserController::class, 'store'])->name('user.store');
+   // 👇 Seulement le super admin peut gérer les comptes admin
+    Route::middleware(['superadmin'])->group(function () {
+        Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+        Route::post('/saved', [RegisteredUserController::class, 'store'])->name('user.store');
+        Route::get('/admin/liste', [AdminController::class, 'index'])->name('admin.liste');
+        Route::delete('/admin/{id}', [AdminController::class, 'destroy'])->name('admin.supprimer');
+        });
 
-    // Liste des administrateurs
-    Route::get('/admin/liste', [AdminController::class, 'index'])->name('admin.liste');
-    Route::delete('/admin/{id}', [AdminController::class, 'destroy'])->name('admin.supprimer');
 });
 
 // Vues publiques

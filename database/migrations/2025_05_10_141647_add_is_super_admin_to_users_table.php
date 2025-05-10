@@ -9,19 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+  public function up()
 {
     Schema::table('users', function (Blueprint $table) {
-        $table->boolean('is_admin')->default(false);
+        $table->boolean('is_super_admin')->default(false); // 👈 ajoute une colonne pour identifier le super admin
     });
 }
 
-public function down(): void
+public function down()
 {
     Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn('is_admin');
+        $table->dropColumn('is_super_admin'); // 👈 supprime la colonne si on annule la migration
     });
 }
 
-    
 };
