@@ -33,6 +33,19 @@
                 <label for="email" class="form-label">Adresse Email</label>
                 <input type="email" name="email" class="form-control" required value="{{ old('email') }}">
             </div>
+            {{-- Commune --}}
+<div class="mb-3">
+    <label for="commune_id" class="form-label">Commune à gérer</label>
+    <select name="commune_id" class="form-control" required>
+        <option value="">-- Choisir une commune --</option>
+        @foreach($communes as $commune)
+            <option value="{{ $commune->id }}" {{ old('commune_id') == $commune->id ? 'selected' : '' }}>
+                {{ $commune->nom }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
 
             {{-- Mot de passe --}}
             <div class="mb-3">

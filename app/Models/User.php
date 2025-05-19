@@ -23,7 +23,14 @@ class User extends Authenticatable
         'password',
         'is_admin', 
          'is_super_admin',
+          'commune_id',
     ];
+
+    public function commune()
+{
+    return $this->belongsTo(Commune::class);
+}
+
 
     /**
      * The attributes that should be hidden for serialization.

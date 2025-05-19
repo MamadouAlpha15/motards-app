@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
- 
+ $this->call(CommuneSeeder::class);
 
 User::updateOrCreate(
     ['email' => 'keitaalpha@gmail.com'],
@@ -28,4 +28,5 @@ User::updateOrCreate(
 
     }
     
+
 }

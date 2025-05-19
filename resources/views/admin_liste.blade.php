@@ -1,11 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+
+
 <div class="container py-4">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-3">
         <h2 class="text-center text-md-start mb-3 mb-md-0">👨‍💼 Liste des Administrateurs</h2>
         <a href="{{ route('motards.index') }}" class="btn btn-warning">
-            <i class="bi bi-arrow-left"></i> Retour à la Liste Motards
+            <i class="bi bi-arrow-left"></i> Liste des Communes
         </a>
     </div>
 

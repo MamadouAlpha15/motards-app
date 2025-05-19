@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
+use App\Models\Commune;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,35 +16,38 @@ use Illuminate\View\View;
 class RegisteredUserController extends Controller
 {
     /**
-     * Display the registration view.
+     * Affiche la vue d'enregistrement d'un administrateur
      */
     public function create(): View
     {
-        return view('auth_register');
+        $communes = Commune::all();
+        return view('auth_register', compact('communes'));
     }
 
     /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Enregistre un nouvel administrateur d'une commune
      */
     public function store(Request $request): RedirectResponse
     {
+        // Validation des champs
         $request->validate([
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'commune_id' => ['required', 'exists:communes,id'],
         ]);
-    
-        // Crée l'utilisateur avec le statut admin = true
+
+        // Création de l'admin
         $user = User::create([
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'is_admin' => true, // Ajoute ceci
+            'is_admin' => true,
+            'commune_id' => $request->commune_id,
         ]);
-    
-        // N'enregistre pas la session avec Auth::login()
-    
-        return redirect()->route('motards.index')->with('success', 'Nouvel administrateur créé avec succès.');
+
+        // 🔁 Redirection vers la commune du nouvel admin
+        $commune = Commune::find($user->commune_id);
+
+        return redirect()->route('motards.index', ['commune' => $commune->slug])
+                         ->with('success', 'Administrateur créé avec succès.');
     }
-    
 }

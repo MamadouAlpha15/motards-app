@@ -20,7 +20,14 @@ class Motard extends Model
         'base_stationnement',
         'photo',
         'slug',
+         'commune_id',
     ];
+
+    public function commune()
+{
+    return $this->belongsTo(Commune::class);
+}
+
 
     protected static function boot()
     {

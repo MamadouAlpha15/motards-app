@@ -40,6 +40,8 @@
 
             {{-- Bouton de connexion --}}
             <button type="submit" class="btn btn-dark w-100">Connexion</button>
+            <a href="{{ route('password.request') }}">Mot de passe oublié ?</a>
+
         </form>
     </div>
 </div>

@@ -3,10 +3,29 @@
 
 @section('content')
 
+
+
 <!---afficha de l'utilisateur connecter !--->
-@if(Auth::check())
+{{-- Si un utilisateur est connecté et ce n’est PAS un superadmin --}}
+@if(Auth::check() && !Auth::user()->is_super_admin)
     <div class="alert alert-info text-center fw-bold">
         Utilisateur connecté : {{ Auth::user()->email }}
+    </div>
+@endif
+
+{{-- Si c’est un superadmin, mais il est sur une commune précise ET qu’un admin existe --}}
+@php
+    use App\Models\User;
+    use App\Models\Commune;
+
+    $communeSlug = request()->query('commune');
+    $commune = $communeSlug ? Commune::where('slug', $communeSlug)->first() : null;
+    $adminCommune = $commune ? User::where('commune_id', $commune->id)->where('is_admin', true)->first() : null;
+@endphp
+
+@if(Auth::check() && Auth::user()->is_super_admin && $adminCommune)
+    <div class="alert alert-secondary text-center fw-bold">
+        Administrateur de cette commune : {{ $adminCommune->email }}
     </div>
 @endif
 
@@ -15,11 +34,8 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
 <div class="motards-container p-4 shadow-lg rounded-4">
-    <h2 class="text-center mb-5 fw-bold text-primary">🚀 Gestion des Motards 🚀</h2>
-
-     <a href="{{route('admin.liste')}}" class="btn btn-secondary ">
-        <i class="bi bi-people"></i> Voir les Administrateurs
-    </a>
+ <h1 class="text-center">Liste des Motards</h1>
+     
      <hr>
     {{-- Message de succès --}}
         @if (session('success'))
@@ -52,7 +68,8 @@
 
     <!-- Ajouter -->
     <div class="text-end mb-4">
-        <a href="{{ route('motards.create') }}" class="btn btn-success btn-lg shadow-sm">
+       <a href="{{ route('motards.create', ['commune' => $commune->slug ?? request('commune')]) }}" class="btn btn-success btn-lg shadow-sm">
+
             <i class="bi bi-plus-circle-dotted"></i> Ajouter un Motard
         </a>
 

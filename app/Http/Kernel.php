@@ -70,6 +70,8 @@ class Kernel extends HttpKernel
         // ...
         'admin' => \App\Http\Middleware\AdminOnly::class,
         'superadmin' => \App\Http\Middleware\SuperAdminOnly::class,
+        \App\Http\Middleware\UpdateLastSeen::class,
+
         
 
     ];
